@@ -1,3 +1,4 @@
+import asyncio
 import os
 
 
@@ -5,6 +6,8 @@ from aiogram import Router
 from aiogram.types import ContentType, FSInputFile
 from aiogram.filters import Command
 from aiogram.types import Message
+
+import delete_files
 from audio_to_text import audio_to_text
 from get_answer_from_assistant import get_answer
 from settings import bot
@@ -38,8 +41,8 @@ async def voice_message_handler(message: Message):
             answer = await get_answer_on_voice_message(mp3_file)
             answer_file = FSInputFile(answer)
             await message.answer_audio(audio=answer_file)
-            os.remove(mp3_file)
-            os.remove(answer)
+            asyncio.run(delete_files.delete_mp3_file_from_root(mp3_file))
+            asyncio.run(delete_files.delete_mp3_file_from_root(answer))
             await message.answer(f"Я получил голосовое сообщение от вас.")
         except Exception as e:
             await message.answer(f"При обработке голосового сообщения возникли проблемы.")
