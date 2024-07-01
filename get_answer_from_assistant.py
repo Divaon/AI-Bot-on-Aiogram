@@ -3,7 +3,7 @@ import time
 from settings import client, config
 
 # Waiting in a loop
-def wait_on_run(run, thread):
+async def wait_on_run(run, thread):
     while run.status == "queued" or run.status == "in_progress":
         run = client.beta.threads.runs.retrieve(
             thread_id=thread.id,
@@ -40,7 +40,7 @@ async def create_thread_and_run(user_input):
 # return answer of assistant
 async def get_answer(question):
     thread, run = await create_thread_and_run(question)
-    run = wait_on_run(run, thread)
+    run = await wait_on_run(run, thread)
     response = await get_response(thread)
     for answer in response:
         if answer.role == "assistant":
