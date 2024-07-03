@@ -39,11 +39,10 @@ async def voice_message_handler(message: Message):
         try:
             mp3_file = await convert_voice_to_mp3(voice_file_id)
             answer = await get_answer_on_voice_message(mp3_file)
-            async with FSInputFile(answer) as answer_file:
-                await message.answer_audio(audio=answer_file)
-            async with asyncio.run(delete_files.delete_mp3_file_from_root(mp3_file)):
-                async with asyncio.run(delete_files.delete_mp3_file_from_root(answer)):
-                 await message.answer(f"Я получил голосовое сообщение от вас.")
+            answer_file = FSInputFile(answer)
+            await message.answer_audio(audio=answer_file)
+            await delete_files.delete_mp3_file_from_root(mp3_file)
+            await delete_files.delete_mp3_file_from_root(answer)
         except Exception as e:
             await message.answer(f"При обработке голосового сообщения возникли проблемы.")
     else:
