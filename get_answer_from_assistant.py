@@ -19,9 +19,10 @@ async def submit_message(assistant_id, thread, user_message):
     client.beta.threads.messages.create(
         thread_id=thread.id, role="user", content=user_message
     )
-    return client.beta.threads.runs.create(
+    return client.beta.threads.runs.create_and_poll(
         thread_id=thread.id,
         assistant_id=assistant_id,
+        poll_interval_ms=2000
     )
 
 
@@ -34,13 +35,17 @@ async def get_response(thread):
 # make tread of assistant
 async def create_thread_and_run(user_input):
     thread = client.beta.threads.create()
-    run =  await submit_message(config.ASSISTANT_ID, thread, user_input)
+    run = await submit_message(config.ASSISTANT_ID, thread, user_input)
     return thread, run
 
 # return answer of assistant
 async def get_answer(question):
     thread, run = await create_thread_and_run(question)
     run = await wait_on_run(run, thread)
+
+    while run.status != "completed":
+        if run.status in ['expired', 'failed', 'cancelled', 'incomplete']:
+            return "Извините. Я не смог обдумать ответ"
     response = await get_response(thread)
     for answer in response:
         if answer.role == "assistant":
