@@ -1,14 +1,13 @@
-import asyncio
-import os
+
 
 
 from aiogram import Router
 from aiogram.types import ContentType, FSInputFile
 from aiogram.filters import Command
 from aiogram.types import Message
-
 import delete_files
 from audio_to_text import audio_to_text
+from check_file import check_and_generate_file_name
 from get_answer_from_assistant import get_answer
 from settings import bot
 from text_to_audio import text_to_audio
@@ -25,8 +24,9 @@ async def get_answer_on_voice_message(audio_file):
 async def convert_voice_to_mp3(voice_file_id):
     file = await bot.get_file(voice_file_id)
     file_path = file.file_path
-    await bot.download_file(file_path, "voice_message.mp3")
-    return "voice_message.mp3"
+    file_name = await check_and_generate_file_name("voice_message")
+    file = await bot.download_file(file_path, file_name)
+    return file_name
 
 @router.message(Command("start"))
 async def start_handler(message: Message):

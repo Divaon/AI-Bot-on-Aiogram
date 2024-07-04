@@ -1,3 +1,4 @@
+from check_file import check_and_generate_file_name
 from settings import client
 
 # return audio with our text
@@ -7,5 +8,6 @@ async def text_to_audio(text):
         voice="alloy",
         input=text
     )
-    responces.stream_to_file("output.mp3")
-    return "output.mp3"
+    file_name = await check_and_generate_file_name("output")
+    responces.stream_to_file(file_name)
+    return file_name
