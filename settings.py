@@ -12,6 +12,7 @@ class Settings(BaseSettings):
 config = Settings()
 
 
+
 bot = Bot(token=config.TOKEN_API)
 client = OpenAI(
     api_key=config.TOKEN_OPENAI,
